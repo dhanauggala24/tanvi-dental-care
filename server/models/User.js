@@ -16,6 +16,13 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+    phone: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+    },
+
     password: {
       type: String,
       required: true,
@@ -25,6 +32,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       enum: ["owner", "receptionist"],
       required: true,
+    },
+
+    specialization: {
+      type: String,
+      default: "Dental Surgeon",
     },
 
     isActive: {
