@@ -2,16 +2,11 @@ import mongoose from "mongoose";
 
 const clinicalNoteSchema = new mongoose.Schema(
   {
-    clinicalNoteId: {
-      type: String,
-      unique: true,
-      required: true,
-    },
-
     appointment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Appointment",
       required: true,
+      unique: true,
     },
 
     patient: {
@@ -38,32 +33,28 @@ const clinicalNoteSchema = new mongoose.Schema(
       trim: true,
     },
 
-    toothNumbers: [
-      {
-        type: String,
-      },
-    ],
-
     treatmentDone: {
       type: String,
       required: true,
       trim: true,
     },
 
-    medicines: [
-      {
-        name: String,
-        dosage: String,
-        frequency: String,
-        duration: String,
-      },
-    ],
+    prescription: {
+      type: String,
+      default: "",
+      trim: true,
+    },
 
-    nextVisitDate: Date,
+    advice: {
+      type: String,
+      default: "",
+      trim: true,
+    },
 
-    nextVisitReason: String,
-
-    remarks: String,
+    followUpDate: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,
