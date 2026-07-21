@@ -1,7 +1,11 @@
 import Patient from "../models/Patient.js";
 import Appointment from "../models/Appointment.js";
+import ClinicalNote from "../models/ClinicalNote.js";
 import User from "../models/User.js";
 
+// ============================
+// Register Patient + Appointment
+// ============================
 export const registerPatient = async (req, res) => {
   try {
     const {
@@ -30,7 +34,7 @@ export const registerPatient = async (req, res) => {
       });
     }
 
-    // Create appointment
+    // Create Appointment
     const appointmentCount = await Appointment.countDocuments();
 
     const appointment = await Appointment.create({
@@ -55,6 +59,10 @@ export const registerPatient = async (req, res) => {
     });
   }
 };
+
+// ============================
+// Get All Appointments
+// ============================
 export const getAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.find()
@@ -74,6 +82,10 @@ export const getAppointments = async (req, res) => {
     });
   }
 };
+
+// ============================
+// Approve Appointment
+// ============================
 export const approveAppointment = async (req, res) => {
   try {
     const { id } = req.params;
@@ -105,13 +117,14 @@ export const approveAppointment = async (req, res) => {
   }
 };
 
-
+// ============================
+// Assign Doctor
+// ============================
 export const assignDoctor = async (req, res) => {
   try {
     const { id } = req.params;
     const { doctorId } = req.body;
 
-    // Find appointment
     const appointment = await Appointment.findById(id);
 
     if (!appointment) {
@@ -121,7 +134,6 @@ export const assignDoctor = async (req, res) => {
       });
     }
 
-    // Find doctor
     const doctor = await User.findById(doctorId);
 
     if (!doctor || doctor.role !== "owner") {
@@ -131,7 +143,6 @@ export const assignDoctor = async (req, res) => {
       });
     }
 
-    // Assign doctor
     appointment.doctor = doctor._id;
 
     await appointment.save();
@@ -141,7 +152,48 @@ export const assignDoctor = async (req, res) => {
       message: "Doctor assigned successfully",
       appointment,
     });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
 
+// ============================
+// Patient History
+// ============================
+export const getPatientHistory = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find Patient
+    const patient = await Patient.findById(id);
+
+    if (!patient) {
+      return res.status(404).json({
+        success: false,
+        message: "Patient not found",
+      });
+    }
+
+    // Get Clinical Notes
+    const history = await ClinicalNote.find({
+      patient: patient._id,
+    })
+      .populate("doctor", "fullName email specialization")
+      .populate(
+        "appointment",
+        "appointmentId appointmentDate appointmentTime problem status"
+      )
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      patient,
+      totalVisits: history.length,
+      history,
+    });
   } catch (error) {
     res.status(500).json({
       success: false,
