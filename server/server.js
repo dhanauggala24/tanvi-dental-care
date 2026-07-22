@@ -5,6 +5,7 @@ import authRoutes from "./routes/authRoutes.js";
 import dashboardRoutes from "./routes/dashboardRoutes.js";
 import patientRoutes from "./routes/patientRoutes.js";
 import doctorRoutes from "./routes/doctorRoutes.js";
+import billRoutes from "./routes/billRoutes.js";
 dotenv.config();
 
 connectDB();
@@ -16,6 +17,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/patients", patientRoutes);
 app.use("/api/doctors", doctorRoutes);
+app.use("/api/bills", billRoutes);
 app.get("/", (req, res) => {
   res.send("🚀 Tanvi Dental Care API is Running...");
 });
