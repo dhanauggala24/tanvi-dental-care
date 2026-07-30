@@ -1,5 +1,10 @@
 import express from "express";
-import { generateBill } from "../controllers/billController.js";
+import {
+  generateBill,
+  getAllBills,
+  getBillById,
+} from "../controllers/billController.js";
+
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
@@ -7,4 +12,7 @@ const router = express.Router();
 // Generate Bill
 router.post("/", protect, generateBill);
 
+// Get All Bills
+router.get("/", protect, getAllBills);
+router.get("/:id", protect, getBillById);
 export default router;
