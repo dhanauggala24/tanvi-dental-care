@@ -146,3 +146,53 @@ export const getBillById = async (req, res) => {
     });
   }
 };
+// ===================================
+// Update Payment
+// ===================================
+export const updatePayment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { amountPaid, paymentMethod } = req.body;
+
+    const bill = await Bill.findById(id);
+
+    if (!bill) {
+      return res.status(404).json({
+        success: false,
+        message: "Bill not found",
+      });
+    }
+
+    // Add new payment to existing payment
+    bill.amountPaid += amountPaid;
+
+    // Update payment method
+    if (paymentMethod) {
+      bill.paymentMethod = paymentMethod;
+    }
+
+    // Update payment status
+    if (bill.amountPaid >= bill.totalAmount) {
+      bill.paymentStatus = "Paid";
+      bill.amountPaid = bill.totalAmount; // Prevent overpayment
+    } else if (bill.amountPaid > 0) {
+      bill.paymentStatus = "Partial";
+    } else {
+      bill.paymentStatus = "Pending";
+    }
+
+    await bill.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Payment updated successfully",
+      bill,
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
